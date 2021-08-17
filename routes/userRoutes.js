@@ -152,46 +152,84 @@ router.get("/:id/wishlist", (req, res) => {
 		});
 });
 
-router.put("/:id/cart", (req, res) => {
+router.post("/:id/cart", (req, res) => {
 	const { product } = req.body;
-	User.findByIdAndUpdate(
-		req.params.id,
-		{
-			$addToSet: { cart: { product } },
-		},
-		{
-			new: true,
-			useFindAndModify: false,
-		}
-	)
+	User.findById(req.params.id)
 		.then((user) => {
 			if (!user) {
 				return res.status(404).json({ success: false, message: "User with the given id was not found!" });
 			}
-			return res.status(200).json({ success: true, user });
+
+			let isNewProduct = user.cart.every((cartItem) => {
+				return cartItem.product != product;
+			});
+
+			if (!isNewProduct) return res.status(400).json({ success: false, message: "Product is already in cart!" });
+			user.cart.push({ product });
+			user.save()
+				.then((user) => {
+					return res.status(200).json({ success: true, user });
+				})
+				.catch((err) => {
+					return res.status(400).json({ success: false, error: err });
+				});
 		})
 		.catch((err) => {
 			return res.status(400).json({ success: false, error: err });
 		});
 });
 
-router.put("/:id/wishlist", (req, res) => {
+router.post("/:id/wishlist", (req, res) => {
 	const { product } = req.body;
-	User.findByIdAndUpdate(
-		req.params.id,
-		{
-			$addToSet: { wishlist: { product } },
-		},
-		{
-			new: true,
-			useFindAndModify: false,
-		}
-	)
+	User.findById(req.params.id)
 		.then((user) => {
 			if (!user) {
 				return res.status(404).json({ success: false, message: "User with the given id was not found!" });
 			}
-			return res.status(200).json({ success: true, user });
+
+			let isNewProduct = user.wishlist.every((wishlistItem) => {
+				return wishlistItem.product != product;
+			});
+
+			if (!isNewProduct)
+				return res.status(400).json({ success: false, message: "Product is already in wishlist!" });
+			user.wishlist.push({ product });
+			user.save()
+				.then((user) => {
+					return res.status(200).json({ success: true, user });
+				})
+				.catch((err) => {
+					return res.status(400).json({ success: false, error: err });
+				});
+		})
+		.catch((err) => {
+			return res.status(400).json({ success: false, error: err });
+		});
+});
+
+router.post("/:userId/cart/:productId", (req, res) => {
+	const { count } = req.body;
+	User.findById(req.params.userId)
+		.then((user) => {
+			if (!user) {
+				return res.status(404).json({ success: false, message: "User with the given id was not found!" });
+			}
+
+			let productIndex = user.cart.findIndex((cartItem) => {
+				return cartItem.product._id == req.params.productId;
+			});
+
+			if (productIndex == -1) return res.status(400).json({ success: false, message: "Product not found!" });
+			user.cart[productIndex].quantity += Number(count);
+			if (user.cart[productIndex].quantity <= 0)
+				return res.status(400).json({ success: false, message: "Product quantity cannot be 0!" });
+			user.save()
+				.then((user) => {
+					return res.status(200).json({ success: true, user });
+				})
+				.catch((err) => {
+					return res.status(400).json({ success: false, error: err });
+				});
 		})
 		.catch((err) => {
 			return res.status(400).json({ success: false, error: err });
