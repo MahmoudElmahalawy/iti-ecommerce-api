@@ -33,8 +33,13 @@ const userSchema = new mongoose.Schema({
 			product: {
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "Product",
-				unique: true,
 			},
+			quantity: {
+				type: Number,
+				default: 1,
+				min: 1,
+			},
+			unique: true,
 		},
 	],
 	wishlist: [
@@ -43,6 +48,7 @@ const userSchema = new mongoose.Schema({
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "Product",
 			},
+			unique: true,
 		},
 	],
 });
