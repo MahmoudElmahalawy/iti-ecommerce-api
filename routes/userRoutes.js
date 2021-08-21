@@ -236,4 +236,31 @@ router.post("/:userId/cart/:productId", (req, res) => {
 		});
 });
 
+router.delete("/:userId/cart/:productId", (req, res) => {
+	User.findById(req.params.userId)
+		.then((user) => {
+			if (!user) {
+				return res.status(404).json({ success: false, message: "User with the given id was not found!" });
+			}
+
+			let productIndex = user.cart.findIndex((cartItem) => {
+				return cartItem.product._id == req.params.productId;
+			});
+
+			if (productIndex == -1) return res.status(400).json({ success: false, message: "Product not found!" });
+			user.cart.splice(productIndex, 1);
+
+			user.save()
+				.then((user) => {
+					return res.status(200).json({ success: true, user });
+				})
+				.catch((err) => {
+					return res.status(400).json({ success: false, error: err });
+				});
+		})
+		.catch((err) => {
+			return res.status(400).json({ success: false, error: err });
+		});
+});
+
 module.exports = router;
