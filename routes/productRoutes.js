@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const { multerUpload } = require("../helpers/multer-upload");
+
 const Product = require("../models/product");
 const Category = require("../models/category");
 
@@ -38,32 +40,24 @@ router.get("/:id", (req, res) => {
 		});
 });
 
-router.post("/", (req, res) => {
+router.post("/", multerUpload.single("images"), (req, res) => {
 	Category.findById(req.body.category).then((category) => {
 		if (!category) {
 			return res.status(400).json({ success: false, message: "Invalid category" });
 		}
 	});
 
-	const {
-		name,
-		shortDescription,
-		description,
-		images,
-		brand,
-		price,
-		category,
-		countInStock,
-		rating,
-		reviews,
-		isFeatured,
-	} = req.body;
+	const fileName = req.file.filename;
+	const basePath = `${req.protocol}://${req.get("host")}/images/categories/${req.body.category}/`;
+
+	const { name, shortDescription, description, brand, price, category, countInStock, rating, reviews, isFeatured } =
+		req.body;
 
 	let product = new Product({
 		name,
 		shortDescription,
 		description,
-		images,
+		images: `${basePath}${fileName}`,
 		brand,
 		price,
 		category,
