@@ -22,7 +22,8 @@ const multerUpload = multer({
 	},
 	storage: multer.diskStorage({
 		destination: (req, file, callback) => {
-			const path = `public/images/categories/${req.body.category}/`;
+			const productDir = req.body.name.replace(/[ ,.]/g, "-");
+			const path = `public/images/categories/${req.body.category}/${productDir}/`;
 
 			fs.mkdirsSync(path);
 			callback(null, path);

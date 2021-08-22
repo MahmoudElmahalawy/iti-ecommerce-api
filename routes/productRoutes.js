@@ -47,7 +47,8 @@ router.post("/", multerUpload.array("images", 4), (req, res) => {
 		}
 	});
 
-	const basePath = `${req.protocol}://${req.get("host")}/images/categories/${req.body.category}/`;
+	const productDir = req.body.name.replace(/[ ,.]/g, "-");
+	const basePath = `${req.protocol}://${req.get("host")}/images/categories/${req.body.category}/${productDir}/`;
 	const imagesUris = req.files.map((file) => {
 		return `${basePath}${file.filename}`;
 	});
