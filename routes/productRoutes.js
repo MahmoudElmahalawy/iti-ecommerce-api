@@ -40,15 +40,18 @@ router.get("/:id", (req, res) => {
 		});
 });
 
-router.post("/", multerUpload.single("images"), (req, res) => {
+router.post("/", multerUpload.array("images", 4), (req, res) => {
 	Category.findById(req.body.category).then((category) => {
 		if (!category) {
 			return res.status(400).json({ success: false, message: "Invalid category" });
 		}
 	});
 
-	const fileName = req.file.filename;
 	const basePath = `${req.protocol}://${req.get("host")}/images/categories/${req.body.category}/`;
+	const imagesUris = req.files.map((file) => {
+		return `${basePath}${file.filename}`;
+	});
+	// console.log(imagesUris);
 
 	const { name, shortDescription, description, brand, price, category, countInStock, rating, reviews, isFeatured } =
 		req.body;
@@ -57,7 +60,7 @@ router.post("/", multerUpload.single("images"), (req, res) => {
 		name,
 		shortDescription,
 		description,
-		images: `${basePath}${fileName}`,
+		images: imagesUris,
 		brand,
 		price,
 		category,
