@@ -8,17 +8,24 @@ const VALID_FILE_TYPE_MAP = {
 };
 
 const multerUpload = multer({
+	limits: { fileSize: 1 * 1024 * 1024 },
+	fileFilter: (req, file, callback) => {
+		const isValidType = VALID_FILE_TYPE_MAP[file.mimetype];
+
+		if (!isValidType) {
+			const err = new Error("Only .png, .jpg and .jpeg format allowed!");
+			err.name = "FileExtensionError";
+			callback(err, false);
+		} else {
+			callback(null, true);
+		}
+	},
 	storage: multer.diskStorage({
 		destination: (req, file, callback) => {
 			const path = `public/images/categories/${req.body.category}/`;
-			const isValidType = VALID_FILE_TYPE_MAP[file.mimetype];
-			let uploadError = new Error("Invalid image type!");
 
-			if (isValidType) {
-				uploadError = null;
-				fs.mkdirsSync(path);
-			}
-			callback(uploadError, path);
+			fs.mkdirsSync(path);
+			callback(null, path);
 		},
 		filename: (req, file, callback) => {
 			//originalname is the uploaded file's name with extension
