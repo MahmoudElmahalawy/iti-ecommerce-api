@@ -16,13 +16,6 @@ const userRoutes = require("./routes/userRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 
-//importing models
-const Product = require("./models/product");
-const Category = require("./models/category");
-const User = require("./models/user");
-const Address = require("./models/address");
-const Order = require("./models/order");
-
 const app = express();
 
 const staticFilesDir = path.join(__dirname, "public");
