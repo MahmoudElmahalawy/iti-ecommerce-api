@@ -60,6 +60,6 @@ mongoose
 	});
 
 //starting the server
-app.listen(3000, () => {
-	console.log("Server is up and running at http://localhost:3000/");
+app.listen(8000, () => {
+	console.log("Server is up and running at http://localhost:8000/");
 });
