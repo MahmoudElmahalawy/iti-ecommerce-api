@@ -41,7 +41,7 @@ router.post("/register", (req, res) => {
 	const passwordHash = bcrypt.hashSync(password, bcrypt.genSaltSync(parseInt(process.env.HASH_SALT)));
 
 	let { isAdmin } = req.body;
-	isAdmin ??= false;
+	if (isAdmin === undefined) isAdmin = false;
 
 	let user = new User({
 		name,
