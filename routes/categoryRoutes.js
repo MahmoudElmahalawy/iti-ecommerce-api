@@ -27,10 +27,13 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-	const { name } = req.body;
+	const { name, image, title, description } = req.body;
 
 	let category = new Category({
 		name,
+		image,
+		title,
+		description,
 	});
 
 	category
